@@ -1,0 +1,42 @@
+#import Usuario from './Usuario.graphql'
+#import UsuarioInput from './Usuario.graphql'
+#import UsuarioFiltro from './Usuario.graphql'
+#import Perfil from './Usuario.graphql'
+#import PerfilInput from './Usuario.graphql'
+#import PerfilFiltro from './Usuario.graphql'
+
+
+type Mutation {
+    # O uso de virgula é opcional
+
+    # Algumas mutation possuem um filtro que pode ser usado para filtrar os dados na execução da mutation
+    # Algumas mutations receberão dados do tipo que foi definido nos atributos do input especificado
+
+    # Mutations de Usuario
+    novoUsuario(
+        dados: UsuarioInput!
+    ): Usuario!
+
+    excluirUsuario(
+        filtro: UsuarioFiltro!
+    ): Usuario
+
+    alterarUsuario(
+        filtro: UsuarioFiltro!
+        dados: UsuarioInput!
+    ): Usuario
+
+    # Mutations de Perfil
+    novoPerfil(
+        dados: PerfilInput!
+    ): Perfil!
+
+    excluirPerfil(
+        filtro: PerfilFiltro!
+    ): Perfil
+
+    alterarPerfil(
+        filtro: PerfilFiltro!
+        dados: PerfilInput!
+    ): Perfil
+}

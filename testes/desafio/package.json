@@ -1,0 +1,24 @@
+{
+    "name": "schema-query-initial",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "start": "nodemon --ext js,graphql"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "@graphql-tools/graphql-file-loader": "^7.3.3",
+      "@graphql-tools/json-file-loader": "^7.3.3",
+      "@graphql-tools/load": "^7.4.1",
+      "@graphql-tools/load-files": "^6.5.2",
+      "@graphql-tools/url-loader": "^7.5.2",
+      "express": "^4.17.1",
+      "express-graphql": "^0.12.0",
+      "graphql": "^15.7.2",
+      "graphql-tools": "^8.2.0",
+      "nodemon": "^2.0.15"
+    }
+  }
