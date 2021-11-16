@@ -1,5 +1,6 @@
 const db = require('../../config/db')
 const { perfil: obterPerfil } = require('../Query/perfil.js'); // Renomeia perfil para: obterPerfil
+const { usuario: obterUsuario } = require('../Query/usuario.js'); // Renomeia usuario para: obterUsuario
 
 module.exports = {
     async novoUsuario(_, { dados }) {
@@ -34,7 +35,22 @@ module.exports = {
         }
     },
     async excluirUsuario(_, { filtro }) {
-        // Implementar
+        try {
+            // Obtém o objeto do usuário a ser excluído
+            const usuario = await obterUsuario(_, { filtro });
+            // Se existir o objeto do usuário, faça...
+            if(usuario) {
+                const { id } = usuario; // Pega o id do objeto usuário e guarda na var id
+                await db('usuarios_perfis')
+                    .where({ usuario_id: id }).delete(); // Deleta o perfil associado ao usuário
+                await db('usuarios')
+                    .where({ id }).delete(); // Deleta o usuário associado a variável id
+            }
+            return usuario;
+        } catch(e) {
+            throw new Error(e.sqlMessage);
+        }
+
     },
     async alterarUsuario(_, { filtro, dados }) {
         // Implementar
