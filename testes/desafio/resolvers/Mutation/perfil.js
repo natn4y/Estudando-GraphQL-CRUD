@@ -35,6 +35,21 @@ module.exports = {
         }
     },
     async alterarPerfil(_, { filtro, dados }) {
-        // implementar
+        try {
+            // Faz a busca do perfil a partir do filtro passado
+            const perfil = await obterPerfil(_, { filtro });
+            // Se achou o perfil:
+            if (perfil) {
+                // Pega o id do perfil
+                const { id } = perfil;
+                // Atualiza o perfil
+                await db('perfis').where({ id })
+                .update(dados);
+            }
+            // Retorna o perfil sobrescrevendo os dados antigos pelos novos
+            return { ...perfil, ...dados };
+        } catch (e) {
+            throw new Error(e.sqlMessage);
+        }
     }
 }
