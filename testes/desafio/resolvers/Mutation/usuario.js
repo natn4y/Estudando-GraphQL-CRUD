@@ -53,6 +53,45 @@ module.exports = {
 
     },
     async alterarUsuario(_, { filtro, dados }) {
-        // Implementar
+        try {
+            // Obtém o objeto do usuário a ser alterado
+            const usuario = await obterUsuario(_, { filtro });
+            // Se existir o objeto do usuário, faça...
+            if (usuario) {
+                const { id } = usuario; // Pega o id do objeto usuário e guarda na var id
+                // Se dentro de dados tiver um atributo chamado perfis, então...
+                if (dados.perfis) {
+                    // Deleta o perfil associado ao usuário
+                    await db('usuarios_perfis')
+                        .where({ usuario_id: id }).delete();
+                    for (let filtro of dados.perfis) {
+                        // var perfil recebe o return de ObterPerfil
+                        const perfil = await obterPerfil(_, { filtro });
+                        // Se existir o objeto do perfil, faça...
+                        // Insere no banco de dados o id do perfil passando o id do obj perfil e o id do usuário passando a var id
+                        if (perfil) {
+                            await db('usuarios_perfis')
+                                .insert({
+                                    perfil_id: perfil.id,
+                                    usuario_id: id,
+                                })
+                        } else {
+                            throw new Error('Verifique se os Perfis solicitados estão cadastrados');
+                        }
+                    }
+                }
+                // Deleta o atributo perfis dentro de dados antes de inserir o novo usuário,
+                // pois não é necessário no banco de dados, já que esse atributo é gerado pelo join
+                delete dados.perfis;
+                // Atualiza o usuário associado a var id
+                await db('usuarios')
+                    .where({ id })
+                    .update(dados);
+            }
+            // Se não tiver setado o usuário, é retornado null, caso contrário retorna o obj atualizado
+            return !usuario ? null : { ...usuario, ...dados };
+        } catch (e) {
+            throw new Error(e);
+        }
     }
 }
