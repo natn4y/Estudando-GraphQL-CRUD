@@ -4,13 +4,17 @@
 #import Perfil from './Usuario.graphql'
 #import PerfilInput from './Usuario.graphql'
 #import PerfilFiltro from './Usuario.graphql'
-
+#import UsuarioRegistrarInput from './Usuario.graphql'
 
 type Mutation {
     # O uso de virgula é opcional
 
     # Algumas mutation possuem um filtro que pode ser usado para filtrar os dados na execução da mutation
     # Algumas mutations receberão dados do tipo que foi definido nos atributos do input especificado
+
+    registrarUsuario(
+        dados: UsuarioRegistrarInput!
+    ): Usuario!
 
     # Mutations de Usuario
     novoUsuario(

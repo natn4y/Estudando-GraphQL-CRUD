@@ -1,13 +1,27 @@
+const bcrypt = require('bcrypt-nodejs')
 const db = require('../../config/db')
 const { perfil: obterPerfil } = require('../Query/perfil.js'); // Renomeia perfil para: obterPerfil
 const { usuario: obterUsuario } = require('../Query/usuario.js'); // Renomeia usuario para: obterUsuario
 
-module.exports = {
+const mutations = {
+    registrarUsuario(_, { dados }) {
+        return mutations.novoUsuario(_, {
+            dados: {
+                nome: dados.nome,
+                email: dados.email,
+                senha: dados.senha,
+            }
+        }) ;
+    },
     async novoUsuario(_, { dados }) {
         try {
             const idsPerfis = []
-            // Se dentro de dados tiver um atributo chamado perfis, então...
-            if(dados.perfis) {
+                // se não existir o perfil, cria um do tipo comum
+            if(!dados.perfis || dados.perfis.length === 0) {
+                dados.perfis = [{
+                    nome: 'comum'
+                }]
+            }
                 // Para cada perfil (filtro) dentro de dados,
                 for(let filtro of dados.perfis) {
                     // var perfil recebe o return de ObterPerfil
@@ -15,7 +29,10 @@ module.exports = {
                     // Caso receba um return diferente de null, faça...
                     if(perfil) idsPerfis.push(perfil.id)
                 }
-            }
+
+            // Criptografa a senha
+            salt = bcrypt.genSaltSync(10);
+            dados.senha = bcrypt.hashSync(dados.senha, salt);
             // Deleta o atributo perfis dentro de dados antes de inserir o novo usuário,
             // pois não é necessário no banco de dados, já que esse atributo é gerado pelo join
             delete dados.perfis;
@@ -80,6 +97,11 @@ module.exports = {
                         }
                     }
                 }
+                if (dados.senha) {
+                    // Criptografa a senha
+                    salt = bcrypt.genSaltSync(10);
+                    dados.senha = bcrypt.hashSync(dados.senha, salt);
+                }
                 // Deleta o atributo perfis dentro de dados antes de inserir o novo usuário,
                 // pois não é necessário no banco de dados, já que esse atributo é gerado pelo join
                 delete dados.perfis;
@@ -95,3 +117,5 @@ module.exports = {
         }
     }
 }
+
+module.exports = mutations;
