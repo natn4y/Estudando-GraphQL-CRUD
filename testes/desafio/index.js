@@ -12,8 +12,9 @@ const typeDefs = loadSchemaSync(join(__dirname, './schema/index.graphql'), {
 })
 
 const resolvers = require('./resolvers/index.js')
+const context = require('./config/context.js')
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers, context });
 
 server.listen().then(({ url }) => {
   console.log(`🚀  Server executando em: ${url}`);
