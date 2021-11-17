@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const { join } = require('path')
 const { loadSchemaSync } = require('@graphql-tools/load')
 const { addResolversToSchema } = require('@graphql-tools/schema')

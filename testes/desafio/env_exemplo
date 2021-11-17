@@ -1,0 +1,15 @@
+NODE_ENV = development
+#NODE_ENV = production
+
+APP_DB_HOST = "localhost"
+APP_DB_PORT = "3306"
+APP_DB_NAME = "projeto-backend"
+APP_DB_USER = "root"
+APP_DB_PASSWORD =
+
+# APP_DB_SECRET é o hash usado para gerar seus tokens:
+# Essa chave pode ser escrita em SHA1, se essa chave vazar, você terá que mudar o hash,
+# e o usuário terá que se autenticar novamente;
+# Mudando o hash, qualquer outro token gerado pelo hash antigo não será mais válido.
+
+APP_AUTH_SECRET = "Escolher um segredo!"
