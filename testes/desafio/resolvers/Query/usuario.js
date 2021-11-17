@@ -22,10 +22,12 @@ module.exports = {
             return getUsuarioLogado(usuario)
     },
 
-    usuarios() {
+    usuarios(obj, args, context) {
+        context && context.validarAdmin(); // Se context for setado e usuário for admin...
         return db('usuarios')
     },
-    usuario(_, { filtro }) {
+    usuario(_, { filtro }, context) {
+        context && context.validarUsuarioFiltro(filtro); // Valida o filtro para saber se é o usuário logado
         if (!filtro) return null;
         const { id, email } = filtro;
         if (id) {

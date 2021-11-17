@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt-nodejs')
 const db = require('../../config/db')
-const { perfil: obterPerfil } = require('../Query/perfil.js'); // Renomeia perfil para: obterPerfil
-const { usuario: obterUsuario } = require('../Query/usuario.js'); // Renomeia usuario para: obterUsuario
+const { perfil: obterPerfil } = require('../Query/perfil');
+const { usuario: obterUsuario } = require('../Query/usuario');
 
 const mutations = {
     registrarUsuario(_, { dados }) {
@@ -11,27 +11,30 @@ const mutations = {
                 email: dados.email,
                 senha: dados.senha,
             }
-        }) ;
+        });
     },
-    async novoUsuario(_, { dados }) {
+    async novoUsuario(_, { dados }, context) {
+        context && context.validarAdmin()
         try {
             const idsPerfis = []
-                // se não existir o perfil, cria um do tipo comum
-            if(!dados.perfis || dados.perfis.length === 0) {
+            // se não existir o perfil, cria um do tipo comum
+            if (!dados.perfis || !dados.perfis.length) {
                 dados.perfis = [{
                     nome: 'comum'
                 }]
             }
-                // Para cada perfil (filtro) dentro de dados,
-                for(let filtro of dados.perfis) {
-                    // var perfil recebe o return de ObterPerfil
-                    const perfil = await obterPerfil(_, { filtro });
-                    // Caso receba um return diferente de null, faça...
-                    if(perfil) idsPerfis.push(perfil.id)
-                }
+            // Para cada perfil (filtro) dentro de dados
+            for (let filtro of dados.perfis) {
+                // var perfil recebe o return de ObterPerfil
+                const perfil = await obterPerfil(_, {
+                    filtro
+                })
+                // Caso receba um return diferente de null, faça...
+                if (perfil) idsPerfis.push(perfil.id)
+            }
 
-            // Criptografa a senha
-            salt = bcrypt.genSaltSync(10);
+            // criptografa a senha
+            const salt = bcrypt.genSaltSync();
             dados.senha = bcrypt.hashSync(dados.senha, salt);
             // Deleta o atributo perfis dentro de dados antes de inserir o novo usuário,
             // pois não é necessário no banco de dados, já que esse atributo é gerado pelo join
@@ -39,8 +42,9 @@ const mutations = {
             // Insere o usuário no banco de dados e armazena o seu id na var id
             const [ id ] = await db('usuarios')
                 .insert(dados)
-            // Insere no banco de dados o id do perfil e o id do usuário passando a var id
-            for(let perfil_id of idsPerfis) {
+
+            for (let perfil_id of idsPerfis) {
+                // Insere no banco de dados o id do perfil e o id do usuário passando a var id
                 await db('usuarios_perfis')
                     .insert({ perfil_id, usuario_id: id })
             }
@@ -51,12 +55,13 @@ const mutations = {
             throw new Error(e.sqlMessage)
         }
     },
-    async excluirUsuario(_, { filtro }) {
+    async excluirUsuario(_, args, context) {
+        context && context.validarAdmin()
         try {
             // Obtém o objeto do usuário a ser excluído
-            const usuario = await obterUsuario(_, { filtro });
+            const usuario = await obterUsuario(_, args)
             // Se existir o objeto do usuário, faça...
-            if(usuario) {
+            if (usuario) {
                 const { id } = usuario; // Pega o id do objeto usuário e guarda na var id
                 await db('usuarios_perfis')
                     .where({ usuario_id: id }).delete(); // Deleta o perfil associado ao usuário
@@ -69,7 +74,8 @@ const mutations = {
         }
 
     },
-    async alterarUsuario(_, { filtro, dados }) {
+    async alterarUsuario(_, { filtro, dados }, context) {
+        context && context.validarUsuarioFiltro(filtro)
         try {
             // Obtém o objeto do usuário a ser alterado
             const usuario = await obterUsuario(_, { filtro });
@@ -77,13 +83,16 @@ const mutations = {
             if (usuario) {
                 const { id } = usuario; // Pega o id do objeto usuário e guarda na var id
                 // Se dentro de dados tiver um atributo chamado perfis, então...
-                if (dados.perfis) {
+                if (context.admin && dados.perfis) { //! Esse bloco de código só é executado se o usuário for admin
                     // Deleta o perfil associado ao usuário
                     await db('usuarios_perfis')
                         .where({ usuario_id: id }).delete();
+
                     for (let filtro of dados.perfis) {
                         // var perfil recebe o return de ObterPerfil
-                        const perfil = await obterPerfil(_, { filtro });
+                        const perfil = await obterPerfil(_, {
+                            filtro
+                        })
                         // Se existir o objeto do perfil, faça...
                         // Insere no banco de dados o id do perfil passando o id do obj perfil e o id do usuário passando a var id
                         if (perfil) {
@@ -97,9 +106,10 @@ const mutations = {
                         }
                     }
                 }
+
                 if (dados.senha) {
-                    // Criptografa a senha
-                    salt = bcrypt.genSaltSync(10);
+                    // criptografar a senha
+                    const salt = bcrypt.genSaltSync()
                     dados.senha = bcrypt.hashSync(dados.senha, salt);
                 }
                 // Deleta o atributo perfis dentro de dados antes de inserir o novo usuário,

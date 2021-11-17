@@ -1,7 +1,8 @@
 const db = require('../../config/db')
 
 module.exports = {
-    perfis() {
+    perfis(parent, args, context) {
+        context && context.validarAdmin();
         // O método db serve para acessar o banco de dados
         // O parametro perfis é o nome da tabela no banco de dados
         return db('perfis');
@@ -21,7 +22,8 @@ module.exports = {
     },
 
     // O parametro filtro é um objeto que contém os campos que serão usados para filtrar os dados
-    perfil(_, { filtro }) {
+    perfil(_, { filtro }, context) {
+        context && context.validarAdmin();
         // Se não tiver filtro, retorna null
         if (!filtro) {
             return null;
