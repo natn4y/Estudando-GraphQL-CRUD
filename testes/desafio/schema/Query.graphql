@@ -2,9 +2,11 @@
 #import Perfil from './Usuario.graphql'
 #import UsuarioFiltro from './Usuario.graphql'
 #import PerfilFiltro from './Usuario.graphql'
+#import UsuarioLoginInput from './Usuario.graphql'
 
 # Pontos de entrada da sua API!
 type Query {
+    login(dados: UsuarioLoginInput!): Usuario
     # Foi definido um tipo de retorno para cada query
     # As query's no singular possuem um filtro que pode ser usado para filtrar os dados
     usuarios: [Usuario]
