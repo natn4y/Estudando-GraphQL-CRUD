@@ -48,7 +48,8 @@ export default {
     },
     methods: {
         obterUsuarios() {
-            //
+            // Nesse caso, 'this' se trata de uma referência global
+            console.log(this.$api) // É comum usar o '$' quando você cria alguma coisa global, isso evita conflitos
         }
     }
 }

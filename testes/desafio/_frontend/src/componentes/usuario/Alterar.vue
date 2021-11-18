@@ -60,6 +60,7 @@
 
 <script>
 import Erros from '../comum/Erros'
+import gql from 'graphql-tag'
 
 export default {
     components: { Erros },
@@ -90,7 +91,20 @@ export default {
             // Implementar
         },
         obterPerfis() {
-            // implementar
+            // query para obter perfis
+            $api.query({
+                query: gql`{ perfis { id rotulo } }`
+            }).then((resultado) => {
+                // Caso a consulta tenha sido bem sucedida...
+                console.log(resultado)
+                // Armazenar os perfis no array perfis
+                this.perfis = resultado.data.perfis
+                // Limpa os erros
+                this.erros = null
+            }).catch(e => {
+                // Armazenar os erros no array erros
+                this.erros = e
+            })
         }
     }
 }
