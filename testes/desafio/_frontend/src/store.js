@@ -28,6 +28,7 @@ export default new Vuex.Store({
         },
         logout() {
             localStorage.removeItem('token')
+            location.reload();
         }
     }
 })

@@ -88,7 +88,46 @@ export default {
     },
     methods: {
         alterarUsuario() {
-            // Implementar
+            $api.mutate({
+                mutation: gql`mutation (
+                    $idFiltro: Int
+                    $emailFiltro: String
+                    $nome: String
+                    $email: String
+                    $senha: String
+                    $perfis: [PerfilFiltro]
+                ) {
+                    alterarUsuario (
+                        filtro: {
+                            id: $idFiltro
+                            email: $emailFiltro
+                        }
+                        dados: {
+                            nome: $nome
+                            email: $email
+                            senha: $senha
+                            perfis: $perfis
+                        }
+                    ) {
+                        id nome email perfis { rotulo }
+                    }
+                }`,
+                variables: {
+                    idFiltro: this.filtro.id,
+                    emailFiltro: this.filtro.email,
+                    nome: this.usuario.nome,
+                    email: this.usuario.email,
+                    senha: this.usuario.senha,
+                    perfis: this.perfisSelecionados
+                },
+            }).then(resultado => {
+                this.dados = resultado.data.alterarUsuario
+                this.filter = {}
+                this.usuario = {}
+                this.erros = null
+            }).catch(e => {
+                this.erros = e
+            })
         },
         obterPerfis() {
             // query para obter perfis
@@ -96,7 +135,6 @@ export default {
                 query: gql`{ perfis { id rotulo } }`
             }).then((resultado) => {
                 // Caso a consulta tenha sido bem sucedida...
-                console.log(resultado)
                 // Armazenar os perfis no array perfis
                 this.perfis = resultado.data.perfis
                 // Limpa os erros
