@@ -54,6 +54,7 @@
 <script>
 import Erros from '../comum/Erros'
 import gql from 'graphql-tag'
+
 export default {
     components: { Erros },
     data() {
@@ -84,7 +85,7 @@ export default {
         async obterPerfis() {
             // query para obter perfis
             $api.query({
-                query: gql`{ perfis { id rotulo } }`
+                query: gql`query { perfis { id rotulo } }`, fetchPolicy: 'network-only'
             }).then((resultado) => {
                 // Caso a consulta tenha sido bem sucedida...
                 console.log(resultado)
@@ -93,6 +94,7 @@ export default {
                 // Limpa os erros
                 this.erros = null
             }).catch(e => {
+                this.perfis = []
                 // Armazenar os erros no array erros
                 this.erros = e
             })

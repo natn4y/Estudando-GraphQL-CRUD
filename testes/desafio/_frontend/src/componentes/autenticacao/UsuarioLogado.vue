@@ -32,14 +32,14 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
     computed: {
         ...mapGetters(['usuario']),
+
         perfis() {
             if(!this.usuario && !this.usuario.perfis) return null
             // Retorna a lista dos rotulos de perfis de usuário
             return this.usuario.perfis.map(p => p.rotulo).join(', ')
         }
     },
-    methods: mapActions(['setUsuario']),
-    methods: mapActions(['logout'])
+    methods: mapActions(['logout']),
 }
 </script>
 

@@ -31,6 +31,7 @@
 
 <script>
 import Erros from '../comum/Erros'
+import gql from 'graphql-tag'
 
 export default {
     components: { Erros },
@@ -48,10 +49,30 @@ export default {
     },
     methods: {
         obterUsuarios() {
-            // Nesse caso, 'this' se trata de uma referência global
-            console.log(this.$api) // É comum usar o '$' quando você cria alguma coisa global, isso evita conflitos
+            // É comum usar o '$' quando você cria alguma coisa global, isso evita conflitos
+            $api.query({
+                query: gql`
+                    query {
+                        usuarios {
+                            id
+                            nome
+                            email
+                            perfis {
+                                nome rotulo
+                            }
+                        }
+                    }
+                `,
+                fetchPolicy: 'network-only'
+            }).then(resultado => {
+                this.usuarios = resultado.data.usuarios
+                this.erros = null
+            }).catch(e => {
+                this.usuarios = []
+                this.erros = e
+            })
         }
-    }
+    },
 }
 </script>
 
